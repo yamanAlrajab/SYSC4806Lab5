@@ -35,4 +35,10 @@ public class BuddyInfoTest {
         buddy.setPhoneNumber("222222");
         assertEquals("222222", buddy.getPhoneNumber());
     }
+
+    @Test
+    public void addressField_setAndGet() {
+        BuddyInfo buddy = new BuddyInfo("Ali", "6131234567", "123 Main St");
+        assertEquals("123 Main St", buddy.getAddress());
+    }
 }
