@@ -1,25 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Address Book</title>
-</head>
+<head><meta charset="utf-8"><title>Address Book</title></head>
 <body>
-<h2>Buddies in Address Book</h2>
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Phone Number</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="buddy : ${buddies}">
-        <td th:text="${buddy.id}"></td>
-        <td th:text="${buddy.name}"></td>
-        <td th:text="${buddy.phoneNumber}"></td>
-    </tr>
-    </tbody>
-</table>
+<h1 th:text="'AddressBook ' + (${addressBook} != null ? '#' + ${addressBook.id} : '')">Address Book</h1>
+
+<p th:if="${message}" th:text="${message}"></p>
+<p th:if="${addressBook == null and message == null}">AddressBook not found</p>
+
+<ul th:if="${buddies}">
+    <li th:each="b : ${buddies}"
+        th:text="${b.name} + ' — ' + ${b.phoneNumber} + (b.address != null ? ' — ' + ${b.address} : '')">Buddy</li>
+</ul>
+<p th:if="${#lists.isEmpty(buddies)}">No buddies yet.</p>
 </body>
 </html>

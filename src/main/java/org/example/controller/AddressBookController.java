@@ -1,33 +1,46 @@
 package org.example.controller;
 
-import org.example.repository.AddressBookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.ui.Model;
 import org.example.model.AddressBook;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.example.repository.AddressBookRepository;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Controller
 public class AddressBookController {
 
-    @Autowired
-    private AddressBookRepository addressBookRepository;
+    private final AddressBookRepository addressBookRepository;
 
-    @RequestMapping("/")
-    public @ResponseBody String greeting(){
-        return "Hello, World";
+    public AddressBookController(AddressBookRepository addressBookRepository) {
+        this.addressBookRepository = addressBookRepository;
     }
 
-    @GetMapping("/addressBooks/{id}/view")
-    public String viewAddressBook(@PathVariable Long id, Model model){
-        AddressBook addressBook = addressBookRepository.findById(id).orElse(null);
-        if (addressBook != null){
-            model.addAttribute("buddies", addressBook.getBuddies());
+    // Home -> show first address book (if any) using the Thymeleaf view
+    @GetMapping("/")
+    public String home(Model model) {
+        Optional<AddressBook> first = addressBookRepository.findAll().iterator().hasNext()
+                ? Optional.of(addressBookRepository.findAll().iterator().next())
+                : Optional.empty();
+
+        if (first.isPresent()) {
+            model.addAttribute("addressBook", first.get());
+            model.addAttribute("buddies", first.get().getBuddies());
+        } else {
+            model.addAttribute("addressBook", null);
+            model.addAttribute("buddies", null);
+            model.addAttribute("message", "No address books yet.");
         }
         return "addressbook";
     }
 
+    // View a specific book (lowercase path)
+    @GetMapping("/addressbooks/{id}/view")
+    public String view(@PathVariable Long id, Model model) {
+        AddressBook ab = addressBookRepository.findById(id).orElse(null);
+        model.addAttribute("addressBook", ab);
+        model.addAttribute("buddies", ab != null ? ab.getBuddies() : null);
+        return "addressbook";
+    }
 }
